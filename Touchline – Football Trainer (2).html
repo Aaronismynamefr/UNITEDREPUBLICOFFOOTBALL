@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f4d3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Touchline">
+<title>Touchline – Football Trainer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#eef1e8;--ink:#17211c;--mute:#5d6b62;--card:#f8f9f3;--line:#cdd5c6;--pitch:#1f4d3a;--on-pitch:#f3f5ee;--bib:#f26b21;--on-bib:#1a0d04;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1914;--ink:#e9eee4;--mute:#9aaa9f;--card:#16241c;--line:#2a3d31;--pitch:#255c45;--on-pitch:#f3f5ee}}
+:root[data-theme="dark"]{--bg:#0f1914;--ink:#e9eee4;--mute:#9aaa9f;--card:#16241c;--line:#2a3d31;--pitch:#255c45;--on-pitch:#f3f5ee}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif}
+h1,h2,h3,.big{font-family:"Barlow Condensed","Arial Narrow",sans-serif;margin:0;line-height:1}
+button{font:inherit;cursor:pointer;color:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+body{-webkit-text-size-adjust:100%;overscroll-behavior:none}
+.ghost:disabled{opacity:.4}
+.plans button{min-height:64px}
+@media(max-width:760px){.dock{position:sticky;bottom:0;margin:0 -22px -22px;padding:12px 22px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line)}.dock .go{width:100%;min-height:56px}.plans button{min-width:176px}.run .in{min-height:calc(100dvh - 40px);display:flex;flex-direction:column}.ctl .go{min-height:60px;flex:1 1 140px}.ghost{flex:1 1 120px}}
+:focus-visible{outline:3px solid var(--bib);outline-offset:2px}
+.wrap{max-width:1020px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+h1{font-size:clamp(34px,7vw,56px);font-weight:800;letter-spacing:-.01em}
+.sub{color:var(--mute);margin:6px 0 0}
+.stats{display:flex;gap:22px}
+.stat b{display:block;font:700 34px/1 "Barlow Condensed",sans-serif}
+.stat span{font-size:13px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:24px;margin-top:16px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.plans{display:flex;flex-direction:column;gap:8px}
+@media(max-width:760px){.plans{flex-direction:row;overflow-x:auto;padding-bottom:6px}.plans button{min-width:210px}}
+.plans button{text-align:left;background:var(--card);border:1px solid var(--line);border-left:6px solid var(--line);border-radius:4px;padding:12px 14px}
+.plans button[aria-pressed="true"]{border-left-color:var(--bib);border-color:var(--ink);border-left-color:var(--bib)}
+.plans h3{font-size:24px;font-weight:700}
+.plans small{color:var(--mute)}
+.detail{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px}
+.detail h2{font-size:42px;font-weight:800}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tag{border:1px solid var(--ink);border-radius:99px;padding:2px 12px;font-size:14px}
+.tag.hot{background:var(--bib);border-color:var(--bib);color:var(--on-bib);font-weight:600}
+.ex{list-style:none;padding:0;margin:18px 0 22px}
+.ex li{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:12px 0;border-top:1px solid var(--line)}
+.ex b{font-weight:600}
+.ex p{margin:0;color:var(--mute);font-size:15px;grid-column:1}
+.ex .dose{grid-row:1;grid-column:2;font:700 22px/1 "Barlow Condensed",sans-serif;text-align:right}
+.go{background:var(--bib);color:var(--on-bib);border:0;border-radius:4px;padding:14px 28px;font:800 24px/1 "Barlow Condensed",sans-serif;letter-spacing:.02em}
+.go:hover{filter:brightness(1.07)}
+.ghost{min-height:48px;background:transparent;border:2px solid currentColor;border-radius:4px;padding:10px 18px;font-weight:600}
+/* session runner */
+.run{min-height:100vh;min-height:100dvh;background:var(--pitch);color:var(--on-pitch);display:flex;flex-direction:column;padding:20px 16px;padding-top:calc(20px + env(safe-area-inset-top,0px))}
+.run .in{width:100%;max-width:640px;margin:auto;text-align:center}
+.bar{height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.bar i{display:block;height:100%;background:var(--bib)}
+.meta{display:flex;justify-content:space-between;font-size:15px;opacity:.85}
+.phase{font:700 28px/1 "Barlow Condensed",sans-serif;margin-top:48px;color:var(--bib)}
+.run h2{font-size:clamp(44px,11vw,84px);font-weight:800;margin:10px 0}
+.clock{font:800 clamp(110px,32vw,220px)/.9 "Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums}
+.tip{max-width:460px;margin:14px auto 0;opacity:.9}
+.ctl{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:34px}
+.ctl .go{min-width:180px}
+.next{margin-top:26px;font-size:15px;opacity:.8}
+.rule{width:120px;height:120px;border:3px solid rgba(255,255,255,.35);border-radius:50%;margin:30px auto;position:relative}
+.rule::after{content:"";position:absolute;left:-40px;right:-40px;top:50%;border-top:3px solid rgba(255,255,255,.35)}
+.pitch{position:relative;aspect-ratio:360/520;width:100%;max-width:420px;margin:0 auto;border-radius:10px;overflow:hidden;border:3px solid var(--ink);background:#2b7449}
+.pitch svg{position:absolute;inset:0;width:100%;height:100%}
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;text-align:center;font:600 16px/1.1 "Barlow Condensed",sans-serif;opacity:.9;pointer-events:none}
+.pm{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;padding:0;color:#fff}
+.pm i{width:50px;height:50px;border-radius:50%;background:#f3f5ee;color:#17211c;border:3px solid #17211c;display:grid;place-items:center;font:800 26px/1 "Barlow Condensed",sans-serif;font-style:normal;transition:transform .15s}
+.pm span{font:700 15px/1 "Barlow Condensed",sans-serif;background:rgba(8,28,18,.78);padding:3px 8px;border-radius:3px;white-space:nowrap}
+.pm[aria-pressed="true"] i{background:var(--bib);color:var(--on-bib);transform:scale(1.18);box-shadow:0 0 0 4px rgba(255,255,255,.7)}
+.fix{display:none;position:fixed;left:0;right:0;bottom:0;z-index:5;gap:12px;align-items:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:2px solid var(--ink)}
+.fix .who{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0}
+.fix b{display:block;font:800 26px/1 "Barlow Condensed",sans-serif}
+.fix small{color:var(--mute);font-size:13px}
+.fix .go{min-height:56px;padding:0 28px}
+@media(max-width:760px){.dock{display:none}.fix{display:flex}.wrap{padding-bottom:110px}}
+.lnk{background:none;border:0;padding:10px 6px;text-decoration:underline;font-weight:600;color:var(--ink)}
+.login{background:repeating-linear-gradient(#31804f 0 64px,#2b7449 64px 128px)}
+.login h1{font-size:clamp(56px,16vw,96px);font-weight:800}
+.login form{text-align:left}
+.login label{display:block;font-size:14px}
+.login input{width:100%;min-height:54px;border:2px solid rgba(255,255,255,.55);background:rgba(0,0,0,.28);color:#fff;border-radius:4px;padding:0 14px;font:600 20px Barlow,sans-serif;margin:6px 0 14px}
+.seg{display:flex;margin:22px 0 18px;border:2px solid rgba(255,255,255,.55);border-radius:4px;overflow:hidden}
+.seg button{flex:1;min-height:48px;background:none;border:0;font:700 21px "Barlow Condensed",sans-serif}
+.seg [aria-selected="true"]{background:var(--bib);color:var(--on-bib)}
+.err{min-height:24px;margin-bottom:6px;color:#ffe3d0;font-weight:600}
+.login .go,.login .ghost{width:100%}
+.login .ghost{margin-top:12px}
+.fine{font-size:13px;opacity:.85;margin-top:18px}
+.sm{min-height:44px;padding:6px 14px;font-size:15px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:18px 0}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:14px}
+.tile b{display:block;font:800 40px/1 "Barlow Condensed",sans-serif}
+.tile span{color:var(--mute);font-size:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px;margin-bottom:14px}
+.panel h3{font-size:26px;margin-bottom:12px}
+.chart{display:flex;gap:8px;align-items:flex-end;height:170px}
+.chart>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:12px;color:var(--mute)}
+.chart i{display:block;width:100%;background:var(--pitch);border-radius:3px 3px 0 0;min-height:2px}
+.chart .today i{background:var(--bib)}
+.prow{display:grid;grid-template-columns:minmax(110px,150px) 1fr auto;gap:10px;align-items:center;margin:8px 0;font-size:15px}
+.prow u{display:block;height:10px;background:var(--pitch);border-radius:3px;min-width:3px}
+.hrow{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.hrow small{color:var(--mute);display:block}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const PLANS=[
+{id:"speed",name:"Sprint & Agility",level:"Intermediate",focus:"Acceleration, quick feet, change of direction",desc:"Short, sharp efforts with full recovery. Quality over quantity: stop a set when your speed drops.",ex:[
+{n:"Ladder quick feet",tip:"Two feet in every box, eyes up, stay on your toes.",sets:3,t:30,rest:20},
+{n:"Cone zig-zag sprint",tip:"Plant the outside foot and push off hard at each cone.",sets:4,t:20,rest:30},
+{n:"20 m acceleration sprint",tip:"Lean forward for the first 5 steps, then rise into stride.",sets:5,r:1,rest:45},
+{n:"Lateral shuffle",tip:"Low hips, never cross your feet.",sets:3,t:30,rest:25},
+{n:"Single-leg bounds",tip:"Drive the knee up and land softly. Do all reps on one leg, then switch each set.",sets:3,r:8,rest:40}]},
+{id:"strength",name:"Leg Strength",level:"Intermediate",focus:"Squats, hinges and hamstring protection",desc:"Builds the strength behind shots, tackles and sprints. Use a weight that leaves 2 reps in the tank.",ex:[
+{n:"Goblet squat",tip:"Chest tall, knees track over toes, go below parallel.",sets:4,r:10,rest:60},
+{n:"Romanian deadlift",tip:"Push hips back, keep the bar close, feel the hamstrings stretch.",sets:3,r:10,rest:60},
+{n:"Walking lunge",tip:"Long step, back knee kisses the floor.",sets:3,r:12,rest:45},
+{n:"Calf raise",tip:"Pause for one second at the top.",sets:3,r:15,rest:30},
+{n:"Nordic hamstring curl",tip:"Lower as slowly as you can. Use your hands to catch yourself.",sets:3,r:6,rest:60}]},
+{id:"stamina",name:"Stamina Engine",level:"Advanced",focus:"90-minute fitness and repeat sprint ability",desc:"Hard intervals to raise your engine so you are still sharp in the last 15 minutes.",ex:[
+{n:"Interval run",tip:"Hard but controlled, around 85% effort. Hold the same pace every set.",sets:4,t:180,rest:90},
+{n:"Shuttle runs",tip:"Sprint between lines 20 m apart and touch the floor each turn.",sets:6,t:30,rest:30},
+{n:"High knees",tip:"Fast arms, tall posture.",sets:3,t:45,rest:30},
+{n:"Easy jog cool-down",tip:"Breathe through your nose and let your heart rate settle.",sets:1,t:180,rest:0}]},
+{id:"ball",name:"Ball Mastery",level:"Beginner",focus:"Touch, dribbling and passing",desc:"All you need is a ball and a wall. Slow down first, then build speed as the touches get clean.",ex:[
+{n:"Sole toe taps",tip:"Alternate feet, light touches on top of the ball.",sets:3,t:45,rest:20},
+{n:"Inside-outside dribble",tip:"Small touches, keep the ball within a stride.",sets:3,t:45,rest:20},
+{n:"Wall passes",tip:"First-time passes with the inside of the foot. Count each return.",sets:3,r:20,rest:30},
+{n:"Juggling",tip:"Count touches. Thighs and feet, keep it low and calm.",sets:3,r:20,rest:30},
+{n:"Figure-8 dribble",tip:"Weave around two cones with both feet.",sets:3,t:45,rest:20}]},
+{id:"core",name:"Core & Stability",level:"Beginner",focus:"Balance, injury prevention, strong trunk",desc:"A steady core keeps you on your feet in duels and protects your back and groin.",ex:[
+{n:"Plank",tip:"Straight line from head to heels, squeeze glutes.",sets:3,t:40,rest:20},
+{n:"Side plank",tip:"Stack your feet and lift the hips. Switch sides each set.",sets:3,t:30,rest:20},
+{n:"Dead bug",tip:"Press your lower back into the floor as the opposite arm and leg reach out.",sets:3,r:12,rest:25},
+{n:"Glute bridge",tip:"Drive through the heels, hold the top for a second.",sets:3,r:15,rest:25},
+{n:"Bird dog",tip:"Reach long, keep your hips level.",sets:3,r:10,rest:20}]},
+{id:"recover",name:"Recovery & Mobility",level:"Beginner",focus:"Loosen up after match day or hard sessions",desc:"Easy, calm and slow. Breathe out as you sink into each stretch and never force it.",ex:[
+{n:"Hip flexor stretch",tip:"Tuck the pelvis under and lean gently forward. One side per set.",sets:2,t:40,rest:10},
+{n:"Hamstring stretch",tip:"Keep the back long and the knee soft.",sets:2,t:40,rest:10},
+{n:"Pigeon pose",tip:"Relax into the hip. One side per set.",sets:2,t:40,rest:10},
+{n:"Foam roll quads",tip:"Roll slowly and pause on tender spots.",sets:2,t:60,rest:10},
+{n:"Child's pose",tip:"Long, slow breaths.",sets:1,t:60,rest:0}]}
+];
+const $=s=>document.getElementById(s);
+const POS={speed:[50,14,9],stamina:[20,38,8],ball:[80,38,10],strength:[28,66,5],core:[72,66,4],recover:[50,88,1]};
+const PITCH=`<svg viewBox="0 0 360 520" preserveAspectRatio="none" aria-hidden="true">${[...Array(8)].map((_,i)=>`<rect y="${i*65}" width="360" height="65" fill="${i%2?"#2b7449":"#31804f"}"/>`).join("")}<g fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="2"><rect x="12" y="12" width="336" height="496"/><line x1="12" y1="260" x2="348" y2="260"/><circle cx="180" cy="260" r="44"/><rect x="84" y="12" width="192" height="80"/><rect x="132" y="12" width="96" height="30"/><path d="M144.5 92A44 44 0 0 0 215.5 92"/><rect x="84" y="428" width="192" height="80"/><rect x="132" y="478" width="96" height="30"/><path d="M144.5 428A44 44 0 0 1 215.5 428"/><rect x="156" y="4" width="48" height="8"/><rect x="156" y="508" width="48" height="8"/></g><g fill="#fff"><circle cx="180" cy="260" r="3"/><circle cx="180" cy="66" r="3"/><circle cx="180" cy="454" r="3"/></g></svg>`;
+const app=$("app");
+let sel="speed",run=null,timer=null;
+function load(){try{return JSON.parse(localStorage.getItem(SK())||"{}")}catch(e){return{}}}
+function save(o){try{localStorage.setItem(SK(),JSON.stringify(o))}catch(e){}}
+function build(p){const s=[];p.ex.forEach((e,xi)=>{for(let k=1;k<=e.sets;k++){s.push({k:"work",e,set:k,secs:e.t||0});
+ const last=xi===p.ex.length-1&&k===e.sets;if(!last&&e.rest)s.push({k:"rest",e,set:k,secs:e.rest,nx:k<e.sets?e:p.ex[xi+1]})}});return s}
+function mins(p){return Math.max(1,Math.round(build(p).reduce((a,s)=>a+(s.secs||40),0)/60))}
+function fmt(n){return Math.floor(n/60)+":"+String(n%60).padStart(2,"0")}
+function home(){
+ const d=sum(hist()),p=PLANS.find(x=>x.id===sel);
+ app.innerHTML=`<div class="wrap"><header><div><h1>Touchline</h1><p class="sub">${user?`Hi, <b style="text-transform:capitalize">${esc(user)}</b>. `:"Guest mode. "}Tap a player to choose your plan. <button class="lnk" onclick="logout()">${user?"Log out":"Sign in"}</button></p></div>
+ <div class="stats"><div class="stat"><b>${d.n||0}</b><span>sessions done</span></div><div class="stat"><b>${d.m||0}</b><span>minutes trained</span></div><button class="ghost sm" onclick="stats()">History &amp; stats</button></div></header>
+ <div class="grid"><div class="pitch" role="group" aria-label="Pick a position to train">${PITCH}<div class="hint">Pick your<br>position</div>${PLANS.map(x=>{const q=POS[x.id];return `<button class="pm" style="left:${q[0]}%;top:${q[1]}%" aria-pressed="${x.id===sel}" onclick="pick('${x.id}')"><i>${q[2]}</i><span>${x.name}</span></button>`}).join("")}</div>
+ <section class="detail"><h2>${p.name}</h2><div class="tags"><span class="tag hot">${p.level}</span><span class="tag">about ${mins(p)} min</span><span class="tag">${p.ex.length} exercises</span></div>
+ <p>${p.desc}</p><p class="sub">Focus: ${p.focus}.</p>
+ <ul class="ex">${p.ex.map(e=>`<li><b>${e.n}</b><span class="dose">${e.sets} × ${e.t?fmt(e.t).replace(/^0:/,"")+(e.t<60?" s":""):e.r+(e.r===1?" rep":" reps")}</span><p>${e.tip}</p></li>`).join("")}</ul>
+ <div class="dock"><button class="go" onclick="start()">Start session</button></div></section></div></div><div class="fix"><button class="who" onclick="document.querySelector('.detail').scrollIntoView({behavior:'smooth'})"><b>${p.name}</b><small>${p.level}, about ${mins(p)} min. Tap for exercises</small></button><button class="go" onclick="start()">Start</button></div>`;
+}
+function pick(id){sel=id;home()}
+function start(){const p=PLANS.find(x=>x.id===sel);run={p,steps:build(p),i:0,left:0,pause:false,sec:0};run.left=run.steps[0].secs;clearInterval(timer);timer=setInterval(tick,1000);keepAwake(true);beep(660,.12);paint()}
+let wl=null,ac=null;
+function beep(f,d){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.15;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+async function keepAwake(on){try{if(on&&navigator.wakeLock)wl=await navigator.wakeLock.request("screen");else if(wl){wl.release();wl=null}}catch(e){}}
+function tick(){if(!run||run.pause)return;run.sec++;const s=run.steps[run.i];if(s.secs){run.left--;if(run.left<=0){next();return}if(run.left<=3)beep(880,.08)}paint()}
+function next(){run.i++;if(run.i>=run.steps.length)return finish();run.left=run.steps[run.i].secs;beep(1175,.25);try{navigator.vibrate&&navigator.vibrate(200)}catch(e){}paint()}
+function back(){if(run.i>0){run.i--;run.left=run.steps[run.i].secs;paint()}}
+function toggle(){run.pause=!run.pause;paint()}
+function quit(){clearInterval(timer);keepAwake(false);if(run&&run.sec>=30)addHist({ts:Date.now(),id:run.p.id,name:run.p.name,sec:run.sec,done:false});run=null;home()}
+function paint(){
+ const s=run.steps[run.i],work=s.k==="work",pct=Math.round(run.i/run.steps.length*100),nxt=run.steps[run.i+1];
+ const big=s.secs?fmt(run.left):(work&&s.e.r?s.e.r:"");
+ app.innerHTML=`<div class="run"><div class="in"><div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+ <div class="meta"><span>${run.p.name}</span><span>Step ${run.i+1} of ${run.steps.length}</span></div>
+ <div class="phase">${work?"Set "+s.set+" of "+s.e.sets:"Rest"}</div>
+ <h2>${work?s.e.n:"Next: "+s.nx.n}</h2>
+ ${s.secs?`<div class="clock" aria-live="off">${big}</div>`:`<div class="clock">${big}<div style="font-size:.14em;margin-top:8px">${s.e.r===1?"rep":"reps"}</div></div>`}
+ ${work?`<p class="tip">${s.e.tip}</p>`:`<div class="rule" aria-hidden="true"></div>`}
+ <div class="ctl" style="margin-top:auto;padding-top:24px">${s.secs?`<button class="ghost" onclick="toggle()">${run.pause?"Resume":"Pause"}</button>`:""}
+ <button class="go" onclick="next()">${s.secs?(work?"Skip":"Skip rest"):"Set done"}</button></div>
+ <div class="ctl" style="margin-top:12px"><button class="ghost" onclick="back()" ${run.i?"":"disabled"}>Previous step</button><button class="ghost" onclick="quit()">End session</button></div>
+ <p class="next">${nxt&&work&&nxt.k==="work"?"Up next: "+nxt.e.n:""}</p></div></div>`;
+}
+function finish(){
+ clearInterval(timer);keepAwake(false);const sec=run.sec||0,m=Math.max(1,Math.round(sec/60));addHist({ts:Date.now(),id:run.p.id,name:run.p.name,sec,done:true});const name=run.p.name;run=null;
+ app.innerHTML=`<div class="run"><div class="in"><div class="phase">Session complete</div><h2>${name}</h2><div class="rule" aria-hidden="true"></div>
+ <p class="tip">Nice work. About ${m} minutes in the bank. Drink water, eat something with protein and rest your legs.</p>
+ <div class="ctl"><button class="go" onclick="home()">Back to plans</button><button class="ghost" onclick="stats()">See history</button></div></div></div>`;
+}
+let user=null,mode="in";
+const SK=()=>"touchline:"+(user||"guest");
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}}
+function users(){try{return JSON.parse(ls("touchline_users")||"{}")}catch(e){return{}}}
+async function hash(s){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("touchline|"+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){return btoa(s)}}
+function login(){
+ const up=mode==="up";
+ app.innerHTML=`<div class="run login"><div class="in"><div class="rule" aria-hidden="true"></div><h1 class="big">Touchline</h1><p class="tip">Log in to save your sessions and minutes.</p>
+ <div class="seg" role="tablist"><button role="tab" aria-selected="${!up}" onclick="mode='in';login()">Sign in</button><button role="tab" aria-selected="${up}" onclick="mode='up';login()">Create account</button></div>
+ <form onsubmit="return auth(event)"><label for="u">Name</label><input id="u" autocomplete="username" autocapitalize="none" maxlength="20" required>
+ <label for="p">PIN (4 to 8 digits)</label><input id="p" type="password" inputmode="numeric" autocomplete="${up?"new-password":"current-password"}" maxlength="8" required>
+ <div class="err" id="err" role="alert"></div><button class="go" type="submit">${up?"Create account":"Sign in"}</button></form>
+ <button class="ghost" onclick="guest()">Continue as guest</button>
+ <p class="fine">Accounts are saved on this device only. There is no PIN recovery.</p></div></div>`;
+}
+async function auth(e){e.preventDefault();const n=$("u").value.trim().toLowerCase(),p=$("p").value,us=users(),er=$("err");
+ if(n.length<2){er.textContent="Enter a name with at least 2 characters.";return false}
+ if(!/^\d{4,8}$/.test(p)){er.textContent="PIN must be 4 to 8 digits.";return false}
+ const h=await hash(n+"|"+p);
+ if(mode==="up"){if(us[n]){er.textContent="That name is taken on this device. Try signing in.";return false}us[n]=h;ls("touchline_users",JSON.stringify(us))}
+ else if(us[n]!==h){er.textContent="Name or PIN is wrong.";return false}
+ user=n;ls("touchline_session",n);home();return false}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';')}
+const HK=()=>'touchline:hist:'+(user||'guest');
+function hist(){try{return JSON.parse(ls(HK())||'[]')}catch(e){return[]}}
+function addHist(e){const h=hist();h.push(e);ls(HK(),JSON.stringify(h))}
+function sum(h){return{n:h.length,m:Math.round(h.reduce((a,e)=>a+e.sec,0)/60)}}
+function stats(){const h=hist(),t=sum(h),day=864e5,n0=new Date();n0.setHours(0,0,0,0);const d0=+n0;
+const days=[...Array(7)].map((_,i)=>{const s=d0-(6-i)*day,m=Math.round(h.filter(e=>e.ts>=s&&e.ts<s+day).reduce((a,e)=>a+e.sec,0)/60);return{l:new Date(s).toLocaleDateString(undefined,{weekday:'short'}).slice(0,3),m}});
+const mx=Math.max(10,...days.map(x=>x.m));
+const set=new Set(h.map(e=>{const x=new Date(e.ts);x.setHours(0,0,0,0);return +x}));let st=0,c=set.has(d0)?d0:d0-day;while(set.has(c)){st++;c-=day}
+const wk=h.filter(e=>e.ts>=d0-6*day).length,done=h.filter(e=>e.done).length,avg=t.n?Math.round(t.m/t.n):0;
+const by=PLANS.map(p=>{const g=h.filter(e=>e.id===p.id);return{n:p.name,c:g.length,m:Math.round(g.reduce((a,e)=>a+e.sec,0)/60)}}),bm=Math.max(1,...by.map(x=>x.m));
+app.innerHTML=`<div class='wrap'><header><div><h1>History</h1><p class='sub'>${user?esc(user)+'\u2019s training log':'Guest training log'}</p></div><button class='ghost' onclick='home()'>Back</button></header>
+<div class='tiles'>${[[t.n,'sessions'],[t.m,'total minutes'],[avg,'avg min per session'],[st,'day streak'],[wk,'sessions, last 7 days'],[t.n?Math.round(done/t.n*100)+'%':'-','finished fully']].map(x=>`<div class='tile'><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>
+<div class='panel'><h3>Last 7 days (minutes)</h3><div class='chart'>${days.map((x,i)=>`<div class='${i==6?'today':''}'><small>${x.m||''}</small><i style='height:${Math.round(x.m/mx*100)}px'></i><small>${x.l}</small></div>`).join('')}</div></div>
+<div class='panel'><h3>By plan</h3>${by.map(x=>`<div class='prow'><span>${x.n}</span><u style='width:${Math.round(x.m/bm*100)}%'></u><span>${x.c}x, ${x.m} min</span></div>`).join('')}</div>
+<div class='panel'><h3>Sessions</h3>${h.length?h.slice(-30).reverse().map(e=>`<div class='hrow'><div><b>${e.name}</b><small>${new Date(e.ts).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'})}</small></div><div style='text-align:right'>${fmt(e.sec)}<small>${e.done?'Completed':'Ended early'}</small></div></div>`).join(''):`<p class='sub'>No sessions yet. Finish a workout and it shows up here.</p>`}</div></div>`;scrollTo(0,0)}
+function guest(){user=null;ls("touchline_session","guest");home()}
+function logout(){user=null;ls("touchline_session","");mode="in";login()}
+const ss=ls("touchline_session");
+if(ss&&users()[ss]){user=ss;home()}else if(ss==="guest")home();else login();
+</script>
+</body>
+</html>
